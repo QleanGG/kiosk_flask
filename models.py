@@ -13,3 +13,5 @@ class Product(db.Model):
     
     def __str__(self):
         return f"{self.title} - {self.company} - Kosher: {self.kosher} - amount: {self.amount} expires: {self.expiration_date}"
+
+

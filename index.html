@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product CRUD with Axios</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="number"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #productList {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Create a New Product</h2>
+<form id="createProductForm">
+    <input type="text" id="createTitle" placeholder="Title" required>
+    <input type="text" id="createCompany" placeholder="Company" required>
+    <input type="checkbox" id="createKosher"> Kosher
+    <input type="number" id="createAmount" placeholder="Amount" required>
+    <input type="date" id="createExpirationDate" placeholder="Expiration Date">
+    <button type="submit">Create Product</button>
+</form>
+
+<h2>Update Product</h2>
+<form id="updateProductForm">
+    <input type="number" id="updateId" placeholder="Product ID" required>
+    <input type="text" id="updateTitle" placeholder="Title">
+    <input type="text" id="updateCompany" placeholder="Company">
+    <input type="checkbox" id="updateKosher"> Kosher
+    <input type="number" id="updateAmount" placeholder="Amount">
+    <input type="date" id="updateExpirationDate" placeholder="Expiration Date">
+    <button type="submit">Update Product</button>
+</form>
+
+<h2>Delete Product</h2>
+<form id="deleteProductForm">
+    <input type="number" id="deleteId" placeholder="Product ID" required>
+    <button type="submit">Delete Product</button>
+</form>
+
+<h2>Product List</h2>
+<div id="productList"></div>
+
+<script>
+    const apiUrl = 'http://localhost:5000/products'; // Change this to your API URL
+
+    // Create Product
+    document.getElementById('createProductForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const title = document.getElementById('createTitle').value;
+        const company = document.getElementById('createCompany').value;
+        const kosher = document.getElementById('createKosher').checked;
+        const amount = document.getElementById('createAmount').value;
+        const expirationDate = document.getElementById('createExpirationDate').value;
+
+        try {
+            await axios.post(apiUrl, { title, company, kosher, amount, expiration_date: expirationDate });
+            alert('Product created successfully!');
+            document.getElementById('createProductForm').reset();
+            fetchProducts();
+        } catch (error) {
+            console.error('Error creating product:', error);
+        }
+    });
+
+    // Update Product
+    document.getElementById('updateProductForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const id = document.getElementById('updateId').value;
+        const title = document.getElementById('updateTitle').value;
+        const company = document.getElementById('updateCompany').value;
+        const kosher = document.getElementById('updateKosher').checked;
+        const amount = document.getElementById('updateAmount').value;
+        const expirationDate = document.getElementById('updateExpirationDate').value;
+
+        try {
+            await axios.put(`${apiUrl}/${id}`, { title, company, kosher, amount, expiration_date: expirationDate });
+            alert('Product updated successfully!');
+            document.getElementById('updateProductForm').reset();
+            fetchProducts();
+        } catch (error) {
+            console.error('Error updating product:', error);
+        }
+    });
+
+    // Delete Product
+    document.getElementById('deleteProductForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const id = document.getElementById('deleteId').value;
+
+        try {
+            await axios.delete(`${apiUrl}/${id}`);
+            alert('Product deleted successfully!');
+            document.getElementById('deleteProductForm').reset();
+            fetchProducts();
+        } catch (error) {
+            console.error('Error deleting product:', error);
+        }
+    });
+
+    // Fetch Products
+    async function fetchProducts() {
+        try {
+            const response = await axios.get(apiUrl);
+            const products = response.data;
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+
+            products.forEach(product => {
+                const productDiv = document.createElement('div');
+                productDiv.textContent = `ID: ${product.id}, Title: ${product.title}, Company: ${product.company}, Kosher: ${product.kosher}, Amount: ${product.amount}, Expiration Date: ${product.expiration_date}`;
+                productList.appendChild(productDiv);
+            });
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    }
+
+    // Initial fetch
+    fetchProducts();
+</script>
+
+</body>
+</html>
